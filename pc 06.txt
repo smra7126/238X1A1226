@@ -1,0 +1,209 @@
+import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+
+void main() {
+  runApp(
+    ChangeNotifierProvider<AppData>(
+      create: (context) => AppData(),
+      builder: (context, child) => const ImageGalleryApp(),
+    ),
+  );
+}
+
+/// DATA_MODEL
+/// Represents a single image item with its URL and accompanying text.
+class ImageData {
+  final String imageUrl;
+  final String text;
+
+  const ImageData({
+    required this.imageUrl,
+    required this.text,
+  });
+}
+
+/// DATA_MODEL
+/// Holds the application's data, specifically a list of image items.
+/// Extends ChangeNotifier to allow for state management using Provider.
+class AppData extends ChangeNotifier {
+  final List<ImageData> items;
+
+  AppData()
+      : items = [
+          ImageData(
+            imageUrl:
+                'https://www.gstatic.com/flutter-onestack-prototype/genui/example_1.jpg',
+            text:
+                'A serene mountain landscape with a clear blue sky, evoking a sense of calm and grandeur.',
+          ),
+          ImageData(
+            imageUrl:
+                'https://www.gstatic.com/flutter-onestack-prototype/genui/example_1.jpg',
+            text:
+                'An urban vista at dusk, showcasing the vibrant lights of city buildings reflecting on a river.',
+          ),
+          ImageData(
+            imageUrl:
+                'https://www.gstatic.com/flutter-onestack-prototype/genui/example_1.jpg',
+            text:
+                'A lush green forest trail bathed in dappled sunlight, inviting exploration and tranquility.',
+          ),
+          ImageData(
+            imageUrl:
+                'https://www.gstatic.com/flutter-onestack-prototype/genui/example_1.jpg',
+            text:
+                'A delicate flower in full bloom, capturing intricate details and a splash of vivid color.',
+          ),
+          ImageData(
+            imageUrl:
+                'https://www.gstatic.com/flutter-onestack-prototype/genui/example_1.jpg',
+            text:
+                'A picturesque beach with golden sand and gentle waves, perfect for relaxation and contemplation.',
+          ),
+        ];
+
+  // No need for notifyListeners() as items are final and not meant to change
+  // after initialization in this specific implementation.
+  // If items were mutable, notifyListeners() would be called after changes.
+}
+
+class ImageGalleryApp extends StatelessWidget {
+  const ImageGalleryApp({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'Image Gallery',
+      debugShowCheckedModeBanner: false,
+      theme: ThemeData(
+        primarySwatch: Colors.indigo,
+        appBarTheme: const AppBarTheme(
+          backgroundColor: Colors.indigo,
+          foregroundColor: Colors.white,
+        ),
+      ),
+      home: const ImageListScreen(),
+    );
+  }
+}
+
+class ImageListScreen extends StatelessWidget {
+  const ImageListScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    // Access the AppData instance using context.watch for reactive updates.
+    final AppData appData = context.watch<AppData>();
+
+    return Scaffold(
+      appBar: AppBar(title: const Text("Image Gallery")),
+      body: appData.items.isEmpty
+          ? const Center(child: Text("No images available"))
+          : PageView.builder(
+              scrollDirection: Axis.horizontal,
+              itemCount: appData.items.length,
+              itemBuilder: (BuildContext context, int index) {
+                final ImageData item = appData.items[index];
+
+                return AnimatedCard(
+                  imageUrl: item.imageUrl,
+                  text: item.text,
+                );
+              },
+            ),
+    );
+  }
+}
+
+class AnimatedCard extends StatefulWidget {
+  final String imageUrl;
+  final String text;
+
+  const AnimatedCard({required this.imageUrl, required this.text, super.key});
+
+  @override
+  State<AnimatedCard> createState() => _AnimatedCardState();
+}
+
+class _AnimatedCardState extends State<AnimatedCard>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  late Animation<Offset> _slideAnimation;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 600),
+    );
+    _slideAnimation = Tween<Offset>(
+      begin: const Offset(-1.0, 0.0), // Start from left, off-screen
+      end: Offset.zero, // End at original position
+    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeOut));
+
+    _controller.forward();
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return SlideTransition(
+      position: _slideAnimation,
+      child: Center(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 40.0),
+          child: Card(
+            elevation: 8,
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+            child: SingleChildScrollView(
+              // Use SingleChildScrollView to prevent text overflow for long descriptions
+              child: Column(
+                mainAxisSize: MainAxisSize.min, // To keep column compact
+                children: <Widget>[
+                  ClipRRect(
+                    borderRadius:
+                        const BorderRadius.vertical(top: Radius.circular(20)),
+                    child: Image.network(
+                      widget.imageUrl,
+                      height: 250,
+                      width: double.infinity,
+                      fit: BoxFit.cover,
+                      errorBuilder: (BuildContext context, Object error,
+                          StackTrace? stackTrace) {
+                        return Container(
+                          height: 250,
+                          width: double.infinity,
+                          color: Colors.grey[300],
+                          child: const Icon(Icons.broken_image,
+                              color: Colors.grey, size: 80),
+                        );
+                      },
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: Text(
+                      widget.text,
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
