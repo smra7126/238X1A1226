@@ -1,0 +1,94 @@
+import 'package:flutter/material.dart';
+
+
+void main() => runApp(const MyApp());
+
+
+class MyApp extends StatelessWidget {
+const MyApp({Key? key}) : super(key: key);
+
+
+@override
+Widget build(BuildContext context) {
+return MaterialApp(
+debugShowCheckedModeBanner: false,
+title: 'Container Example',
+theme: ThemeData(
+primarySwatch: Colors.blue,
+),
+home: const Scaffold(
+backgroundColor: Color(0xFFF3F5F8),
+body: SafeArea(
+child: Center(
+child: ExampleCard(),
+),
+),
+),
+);
+}
+}
+
+
+/// A reusable card/container that mimics the design from the picture.
+class ExampleCard extends StatelessWidget {
+const ExampleCard({Key? key}) : super(key: key);
+
+
+@override
+Widget build(BuildContext context) {
+// You can adjust width/height to match the image exactly.
+return Container(
+width: 340,
+height: 120,
+padding: const EdgeInsets.all(14),
+decoration: BoxDecoration(
+// subtle diagonal gradient
+gradient: const LinearGradient(
+begin: Alignment.topLeft,
+end: Alignment.bottomRight,
+colors: [Color(0xFFFFFFFF), Color(0xFFEFF3FF)],
+),
+borderRadius: BorderRadius.circular(16),
+boxShadow: [
+BoxShadow(
+color: Colors.black.withOpacity(0.08),
+blurRadius: 10,
+offset: const Offset(0, 6),
+),
+],
+border: Border.all(color: Colors.white.withOpacity(0.6)),
+),
+child: Row(
+crossAxisAlignment: CrossAxisAlignment.center,
+children: [
+// Left: circular avatar / icon
+Container(
+width: 64,
+height: 64,
+decoration: BoxDecoration(
+borderRadius: BorderRadius.circular(14),
+gradient: const LinearGradient(
+colors: [Color(0xFF4E9AF1), Color(0xFF1E88E5)],
+begin: Alignment.topLeft,
+end: Alignment.bottomRight,
+),
+boxShadow: [
+BoxShadow(
+color: Colors.blue.withOpacity(0.2),
+blurRadius: 8,
+offset: const Offset(0, 4),
+)
+],
+),
+child: const Icon(
+Icons.water_drop,
+color: Colors.white,
+size: 36,
+),
+),
+
+
+const SizedBox(width: 14),
+
+
+}
