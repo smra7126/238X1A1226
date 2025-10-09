@@ -1,0 +1,129 @@
+import 'package:flutter/material.dart';
+
+void main() {
+  runApp(ResultApp());
+}
+
+class ResultApp extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'Quiz Result',
+      debugShowCheckedModeBanner: false,
+      theme: ThemeData(primarySwatch: Colors.indigo),
+      home: ResultScreen(trueAnswers: 6, wrongAnswers: 0, totalQuestions: 6),
+    );
+  }
+}
+
+class ResultScreen extends StatelessWidget {
+  final int trueAnswers;
+  final int wrongAnswers;
+  final int totalQuestions;
+
+  const ResultScreen({
+    Key? key,
+    required this.trueAnswers,
+    required this.wrongAnswers,
+    required this.totalQuestions,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    // Calculate the score percentage
+    double scorePercent = (trueAnswers / totalQuestions) * 100;
+
+    // Determine result image and message based on performance
+    String imageUrl;
+    String message;
+
+    if (scorePercent == 100) {
+      imageUrl =
+          'https://cdn-icons-png.flaticon.com/512/190/190411.png'; // trophy icon
+      message = '🎉 Perfect Score! Excellent Work!';
+    } else if (scorePercent >= 60) {
+      imageUrl =
+          'https://cdn-icons-png.flaticon.com/512/2278/2278992.png'; // happy face
+      message = 'Great job! You passed the quiz.';
+    } else {
+      imageUrl =
+          'https://cdn-icons-png.flaticon.com/512/564/564619.png'; // sad face
+      message = 'Keep trying! You can do better.';
+    }
+
+    return Scaffold(
+      appBar: AppBar(title: const Text("Quiz Result")),
+      body: Center(
+        child: Container(
+          padding: const EdgeInsets.all(20),
+          width: double.infinity,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              // Image Container
+              Container(
+                height: 150,
+                width: 150,
+                decoration: BoxDecoration(
+                  image: DecorationImage(
+                    image: NetworkImage(imageUrl),
+                    fit: BoxFit.contain,
+                  ),
+                ),
+              ),
+              const SizedBox(height: 30),
+
+              // Result Text
+              Text(
+                message,
+                style: const TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.indigo),
+                textAlign: TextAlign.center,
+              ),
+
+              const SizedBox(height: 30),
+
+              // Display Scores
+              Container(
+                padding: const EdgeInsets.all(15),
+                decoration: BoxDecoration(
+                  color: Colors.indigo.shade50,
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Column(
+                  children: [
+                    Text(
+                      "True Answers: $trueAnswers",
+                      style: const TextStyle(
+                          fontSize: 18, color: Colors.green, fontWeight: FontWeight.bold),
+                    ),
+                    Text(
+                      "Wrong Answers: $wrongAnswers",
+                      style: const TextStyle(
+                          fontSize: 18, color: Colors.red, fontWeight: FontWeight.bold),
+                    ),
+                    Text(
+                      "Total Questions: $totalQuestions",
+                      style: const TextStyle(
+                          fontSize: 18, color: Colors.black, fontWeight: FontWeight.bold),
+                    ),
+                    const SizedBox(height: 10),
+                    Text(
+                      "Score: ${scorePercent.toStringAsFixed(0)}%",
+                      style: const TextStyle(
+                          fontSize: 20,
+                          color: Colors.indigo,
+                          fontWeight: FontWeight.w700),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
